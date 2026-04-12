@@ -105,7 +105,12 @@ func expandACMEClient(d *schema.ResourceData, meta any, loadReg bool) (*lego.Cli
 
 func expandACMEClient_config(d *schema.ResourceData, meta any, user registration.User) *lego.Config {
 	config := lego.NewConfig(user)
-	config.CADirURL = meta.(*Config).ServerURL
+
+	serverURL := meta.(*Config).ServerURL
+	if v, ok := d.GetOk("server_url"); ok && v.(string) != "" {
+		serverURL = v.(string)
+	}
+	config.CADirURL = serverURL
 
 	// Note this function is used by both the registration and certificate
 	// resources, but key type is not necessary during registration, so
