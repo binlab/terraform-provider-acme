@@ -100,6 +100,12 @@ func resourceACMERegistrationV2() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
+			"server_url": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Default:  "",
+				ForceNew: true,
+			},
 		},
 	}
 }
