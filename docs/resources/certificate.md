@@ -285,6 +285,12 @@ By default, no reason provided in revocation requests. The reason is a string, w
   * privilege-withdrawn
   * aa-compromise
 
+* `insecure_recreate` - Enables automatic recreation of the certificate if the associated 
+  ACME account (registration) is missing or deleted on the server. By default, this is `false` 
+  and the provider will throw an error to prevent accidental recreation with a potentially 
+  leaked account key. It is recommended to enable this only for testing purposes 
+  (e.g., when using stateless ACME servers like Pebble).
+
 * `cert_timeout` - Controls the timeout in seconds for certificate requests
   that are made after challenges are complete. Defaults to 30 seconds.
 
