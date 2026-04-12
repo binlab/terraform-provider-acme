@@ -95,9 +95,11 @@ resource "acme_certificate" "certificate" {
 
 ## Argument Reference
 
-The following arguments are required:
+The following arguments are supported:
 
-* `server_url` - (Required) The URL to the ACME endpoint's directory.
+- `server_url` - (Optional) The URL to the ACME endpoint's directory.
+
+-> **Note:** `server_url` can be specified here at the provider level, or individually on each `acme_certificate` and `acme_registration` resource. This allows a single provider configuration to interact with multiple ACME servers (e.g., both staging and production), which is critical for using the provider dynamically within modules without triggering legacy module restrictions. If specified on a resource, it will override the provider-level URL.
 
 -> Note that the account key is not a provider-level config value at this time
 to allow the management of accounts and certificates within the same provider.
