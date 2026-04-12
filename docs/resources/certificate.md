@@ -3,6 +3,68 @@
 The `acme_certificate` resource can be used to create and manage an ACME TLS
 certificate.
 
+## Fork Enhancements
+
+#### Resource-Level `server_url`
+
+This example demonstrates how to use the fork-specific `server_url` attribute
+to seamlessly chain the environment endpoint from an `acme_registration`
+directly to an `acme_certificate`. This approach completely avoids legacy
+module restrictions and cleanly encapsulates the environment logic.
+
+```terraform
+# Define your environment URL once
+variable "acme_server_url" {
+  default = "https://acme-staging-v02.api.letsencrypt.org/directory"
+}
+
+resource "tls_private_key" "private_key" {
+  algorithm = "RSA"
+}
+
+# The registration uses the specified server URL
+resource "acme_registration" "reg" {
+  account_key_pem = tls_private_key.private_key.private_key_pem
+  email_address   = "nobody@example.com"
+  server_url      = var.acme_server_url
+}
+
+resource "acme_certificate" "certificate" {
+  # Chain account key and the server URL directly from the registration
+  account_key_pem           = acme_registration.reg.account_key_pem
+  server_url                = acme_registration.reg.server_url
+
+  common_name               = "example.com"
+  subject_alternative_names = ["www.example.com"]
+
+  dns_challenge {
+    provider = "route53"
+  }
+}
+```
+
+#### Insecure Recreate
+
+This example demonstrates how to use the fork-specific `insecure_recreate`
+attribute to automatically recreate a certificate if the upstream ACME server
+(e.g., Pebble during local testing) has lost the registration data.
+
+```terraform
+resource "acme_certificate" "certificate" {
+  account_key_pem           = acme_registration.reg.account_key_pem
+  server_url                = acme_registration.reg.server_url
+
+  common_name               = "example.com"
+
+  # Enable only for testing purposes
+  insecure_recreate         = true
+
+  dns_challenge {
+    provider = "route53"
+  }
+}
+```
+
 ## Example
 
 The below example creates both an account and certificate within the same

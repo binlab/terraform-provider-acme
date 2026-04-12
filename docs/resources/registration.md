@@ -19,6 +19,38 @@ provider instances][multiple-provider-instances].
 [multiple-provider-instances]: https://www.terraform.io/docs/configuration/providers.html#alias-multiple-provider-configurations
 [resource-certificate]: ./certificate.md
 
+-> The issue described above is natively solved in this fork by using the
+resource-level `server_url` attribute. Because `server_url` is defined directly on
+the resource with `ForceNew: true`, changing the URL (e.g., from staging to production)
+will correctly trigger a safe destruction of the old account and the creation of a
+new one against the new CA, preventing the resource failure entirely.
+
+## Fork Enhancements
+
+#### Resource-Level `server_url`
+
+This example demonstrates how to use the fork-specific `server_url` attribute to
+register an account directly against a specific ACME endpoint, bypassing the
+provider-level configuration.
+
+```terraform
+# Define your environment URL once
+variable "acme_server_url" {
+  default = "https://acme-staging-v02.api.letsencrypt.org/directory"
+}
+
+resource "tls_private_key" "private_key" {
+  algorithm = "RSA"
+}
+
+# The registration uses the specified server URL
+resource "acme_registration" "reg" {
+  account_key_pem = tls_private_key.private_key.private_key_pem
+  email_address   = "nobody@example.com"
+  server_url      = var.acme_server_url
+}
+```
+
 ## Example
 
 ### Basic Example
