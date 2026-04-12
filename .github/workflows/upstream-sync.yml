@@ -1,0 +1,16 @@
+name: 🔄 Upstream Sync
+
+on:
+  schedule:
+    - cron: "0 2 * * *" # Runs at 02:00 UTC
+  workflow_dispatch:
+
+jobs:
+  sync:
+    name: ${{ github.event_name == 'workflow_dispatch' && '👆 Manual' || '⏱️ Cron' }}
+    uses: binlab/github-toolbox/.github/workflows/upstream-sync.yml@main
+    with:
+      upstream_repo: "vancluever/terraform-provider-acme"
+      upstream_branch: "main"
+      target_branch: "main"
+    secrets: inherit
