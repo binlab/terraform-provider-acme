@@ -1,5 +1,23 @@
 # ACME Certificate and Account Provider
 
+-> **Note:** This provider is a fork of the official `vancluever/acme` provider.
+It is maintained to provide additional features and critical enhancements that
+are currently absent or unsupported in the original upstream repository.
+
+> **Fork Enhancements:**
+>
+> - **Resource-Level `server_url`** (see
+>   [Issue #534](https://github.com/vancluever/terraform-provider-acme/issues/534),
+>   [feat/resource-level-server-url](https://github.com/binlab/terraform-provider-acme/tree/feat/resource-level-server-url)):
+>   Added the ability to specify the ACME `server_url` directly on resources (`acme_certificate`
+>   and `acme_registration`). This allows overriding the provider-level URL, preventing
+>   legacy module restrictions when managing resources across multiple ACME endpoints.
+> - **Insecure Recreate** (see [feat/certificate-insecure-recreate](https://github.com/binlab/terraform-provider-acme/tree/feat/certificate-insecure-recreate)):
+>   Added the `insecure_recreate` flag to the `acme_certificate` resource. This enables
+>   automatic recreation of the certificate if the associated ACME account (registration)
+>   is missing or deleted on the server. This is critical for local testing with stateless
+>   ACME servers (like Pebble) that do not persist state across restarts.
+
 The Automated Certificate Management Environment (ACME) is an evolving standard
 for the automation of a domain-validated certificate authority. Clients register
 themselves on an authority using a private key and contact information, and
@@ -50,7 +68,7 @@ production endpoints, which can be found [here][lets-encrypt-endpoints].
 terraform {
   required_providers {
     acme = {
-      source  = "vancluever/acme"
+      source  = "binlab/acme"
       version = "~> 2.0"
     }
   }
