@@ -377,6 +377,11 @@ func resourceACMECertificateV5() *schema.Resource {
 				Optional: true,
 				Default:  true,
 			},
+			"insecure_recreate": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
 			"revoke_certificate_reason": {
 				Type:         schema.TypeString,
 				Optional:     true,
@@ -501,6 +506,11 @@ func resourceACMECertificateCreate(d *schema.ResourceData, meta any) error {
 func resourceACMECertificateRead(d *schema.ResourceData, meta any) error {
 	client, _, err := expandACMEClient(d, meta, true)
 	if err != nil {
+		if d.Get("insecure_recreate").(bool) && regGone(err) {
+			d.SetId("")
+			return nil
+		}
+
 		return err
 	}
 
