@@ -1,0 +1,68 @@
+name: 🧪 Run Tests
+on:
+  push:
+    branches:
+      - "**"
+      - "!fork"
+      - "!stable"
+    tags-ignore:
+      - "v*"
+  pull_request:
+    branches:
+      - "**"
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  skip-duplicate:
+    name: ⏭️ Deduplicate Runs
+    runs-on: ubuntu-latest
+    outputs:
+      should_skip: ${{ steps.skip_duplicate.outputs.should_skip }}
+    steps:
+      - id: skip_duplicate
+        uses: fkirc/skip-duplicate-actions@v5
+        with:
+          concurrent_skipping: "same_content_newer"
+
+  go-tests:
+    name: 🧪 Go Tests
+    needs: skip-duplicate
+    if: needs.skip_duplicate.outputs.should_skip != 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: 🏗️ Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: "go.mod"
+          check-latest: true
+          cache: true
+
+      - name: 🧪 Run Tests
+        env:
+          ACME_ENABLE_MEMCACHE_TEST: "yes"
+        run: |
+          set -euo pipefail
+
+          echo -e "\e[36m[ACTION] Installing required tools...\e[0m"
+          echo "::group::Make Tools Logs"
+          make tools
+          echo "::endgroup::"
+          echo -e "\e[32m[SUCCESS] Tools installed.\e[0m"
+
+          echo -e "\e[36m[ACTION] Starting test infrastructure (Pebble & Memcached)...\e[0m"
+          echo "::group::Make Infrastructure Logs"
+          make pebble-start memcached-start
+          echo "::endgroup::"
+          echo -e "\e[32m[SUCCESS] Infrastructure ready.\e[0m"
+
+          echo -e "\e[36m[ACTION] Running Go tests...\e[0m"
+          make test
+
+          echo -e "\e[32m[SUCCESS] All tests passed successfully!\e[0m"
