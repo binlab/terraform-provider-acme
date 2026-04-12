@@ -11,7 +11,7 @@ func Provider() *schema.Provider {
 		Schema: map[string]*schema.Schema{
 			"server_url": {
 				Type:        schema.TypeString,
-				Required:    true,
+				Optional:    true,
 				DefaultFunc: schema.EnvDefaultFunc("ACME_SERVER_URL", nil),
 			},
 		},
