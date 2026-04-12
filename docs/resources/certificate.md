@@ -296,6 +296,12 @@ as a DNS challenge), see that challenge provider's specific options.
   deactivated after a certificate has been obtained, preventing their re-use.
   Default: `true`.
 
+* `server_url` - (Optional) The URL to the ACME endpoint's directory.
+
+-> **Note:** Defining `server_url` on the resource overrides the URL specified 
+in the provider configuration. This allows you to manage certificates from different 
+ACME servers (e.g., staging and production) using a single provider instance.
+
 ### Using DNS challenges
 
 This method authenticates certificate domains by requiring the requester to

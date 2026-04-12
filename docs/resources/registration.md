@@ -89,6 +89,12 @@ CA you are using in this case.
     - `hmac_base64` (Required): The base64-encoded message authentication code
       for the external account binding.
 
+* `server_url` - (Optional) The URL to the ACME endpoint's directory.
+
+-> **Note:** Defining `server_url` on the resource overrides the URL specified in 
+the provider configuration. This allows you to manage registrations from different 
+ACME servers (e.g., staging and production) using a single provider instance.
+
 #### Attribute Reference
 
 The following attributes are exported:
